@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GrowHR - Live!</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6/dist/umd/react-router-dom.production.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    const { useState, useEffect } = React;
+    const { BrowserRouter, Routes, Route, Link } = ReactRouterDOM;
+
+    const App = () => {
+      const [user, setUser] = useState(null);
+
+      const login = async (role) => {
+        const endpoint = role === 'admin' ? '/api/login' : '/api/employee-login';
+        const res = await axios.get(endpoint);
+        setUser({ role: res.data.role, dashboard: res.data.dashboard });
+      };
+
+      if (!user) {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="bg-white p-12 rounded-3xl shadow-2xl max-w-md w-full mx-4">
+              <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">GrowHR</h1>
+              
+              <div className="space-y-4">
+                <button 
+                  onClick={() => login('admin')}
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-8 rounded-2xl font-bold text-xl hover:from-red-600 hover:to-red-700 shadow-xl hover:shadow-2xl transition-all"
+                >
+                  👑 Admin Login
+                </button>
+                <button 
+                  onClick={() => login('employee')}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-8 rounded-2xl font-bold text-xl hover:from-green-600 hover:to-green-700 shadow-xl hover:shadow-2xl transition-all"
+                >
+                  👤 Employee Login
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-50">
+          {/* Role Badge */}
+          <div className={`p-4 font-bold text-2xl text-center ${
+            user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+          }`}>
+            {user.role.toUpperCase()} DASHBOARD
+            <button onClick={() => setUser(null)} className="ml-4 text-sm underline">Logout</button>
+          </div>
+
+          {/* Role-Specific Content */}
+          <div className="max-w-6xl mx-auto p-8">
+            {user.role === 'admin' ? (
+              <div>
+                <h2 className="text-3xl font-black mb-8 text-gray-800">👑 ADMIN CONTROL PANEL</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all">
+                    <h3 className="text-2xl font-bold mb-4">👥 Employees</h3>
+                    <p>Add, edit, delete employees</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all">
+                    <h3 className="text-2xl font-bold mb-4">💰 Payroll</h3>
+                    <p>Process salaries</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all">
+                    <h3 className="text-2xl font-bold mb-4">📊 Reports</h3>
+                    <p>PDF exports</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-3xl font-bold mb-8 text-gray-800">👤 MY EMPLOYEE DASHBOARD</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-8 rounded-3xl shadow-xl">
+                    <h3 className="text-xl font-bold mb-4">📅 Request Leave</h3>
+                    <p>Your personal leave requests</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-3xl shadow-xl">
+                    <h3 className="text-xl font-bold mb-4">💵 My Payslip</h3>
+                    <p>Download salary slip</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
